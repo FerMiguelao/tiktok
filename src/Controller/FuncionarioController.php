@@ -6,6 +6,7 @@ use App\Form\FuncionarioType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\EntityManagerInterface;
 
 class FuncionarioController extends AbstractController{
     /**
@@ -18,15 +19,14 @@ class FuncionarioController extends AbstractController{
     /**
      * @Route("/funcionario/novo", methods={"GET", "POST"})
      */
-    public function formulario(Request $request){
+    public function formulario(Request $request, EntityManagerInterface $entityManager){
         $funcionario = new Funcionario();
         $form = $this->createForm(FuncionarioType::class, $funcionario);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($funcionario);
-            $em->flush();
+            $entityManager->persist($funcionario);
+            $entityManager->flush();
 
             return $this->redirect("/funcionario/lista/");
         }
@@ -36,8 +36,8 @@ class FuncionarioController extends AbstractController{
     /**
      * @Route("/funcionario/lista", methods={"GET"})
      */
-    public function lista(){
-        $funcionarios = $this->getDoctrine()->getManager()->getRepository(Funcionario::class)->findAll();
+    public function lista(EntityManagerInterface $entityManager){
+        $funcionarios = $entityManager->getRepository(Funcionario::class)->findAll();
 
         return $this->render('Funcionario/lista.html.twig',["funcionarios" => $funcionarios]);
     }
@@ -45,14 +45,13 @@ class FuncionarioController extends AbstractController{
     /**
      * @Route("funcionario/edita/{id}",methods={"GET", "POST"})
      */
-    public function edita(Funcionario $funcionario,Request $request){
+    public function edita(Funcionario $funcionario,Request $request, EntityManagerInterface $entityManager){
         $form = $this->createForm(FuncionarioType::class, $funcionario);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($funcionario);
-            $em->flush();
+            $entityManager->persist($funcionario);
+            $entityManager->flush();
         }
 
         return $this->renderForm('Funcionario/edita.html.twig', ['funcionario' => $funcionario, 'form' => $form]);
@@ -61,10 +60,9 @@ class FuncionarioController extends AbstractController{
     /**
      * @Route("funcionario/remove/{id}", methods={"GET"})
      */
-    public function remove(Funcionario $funcionario){
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($funcionario);
-        $em->flush();
+    public function remove(Funcionario $funcionario, EntityManagerInterface $entityManager){
+        $entityManager->remove($funcionario);
+        $entityManager->flush();
 
         return $this->redirect("/funcionario/lista");
     }

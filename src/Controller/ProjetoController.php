@@ -7,6 +7,7 @@ use App\Form\ProjetoType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ProjetoController extends AbstractController{
     /**
@@ -19,15 +20,14 @@ class ProjetoController extends AbstractController{
     /**
      * @Route("/projeto/novo", methods={"GET", "POST"})
      */
-    public function formulario(Request $request){
+    public function formulario(Request $request, EntityManagerInterface $entityManager){
         $projeto = new Projeto();
         $form = $this->createForm(ProjetoType::class, $projeto);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($projeto);
-            $em->flush();
+            $entityManager->persist($projeto);
+            $entityManager->flush();
 
             return $this->redirect("/projeto/lista/");
         }
@@ -37,8 +37,8 @@ class ProjetoController extends AbstractController{
     /**
      * @Route("/projeto/lista",methods={"GET"})
      */
-    public function lista(){
-        $repository = $this->getDoctrine()->getManager()->getRepository(Projeto::class);
+    public function lista(EntityManagerInterface $entityManager){
+        $repository = $entityManager->getRepository(Projeto::class);
 
         return $this->render("Projeto/lista.html.twig",["projetos" => $repository->findAll()]);
     }
@@ -46,14 +46,13 @@ class ProjetoController extends AbstractController{
     /**
      * @Route("/projeto/edita/{id}",methods={"GET", "POST"})
      */
-    public function edita(Projeto $projeto, Request $request){
+    public function edita(Projeto $projeto, Request $request, EntityManagerInterface $entityManager){
         $form = $this->createForm(ProjetoType::class, $projeto);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($projeto);
-            $em->flush();
+            $entityManager->persist($projeto);
+            $entityManager->flush();
         }
         return $this->renderForm('Projeto/edita.html.twig',["projeto" => $projeto,"form" => $form]);
     }
@@ -61,10 +60,9 @@ class ProjetoController extends AbstractController{
     /**
      * @Route("/projeto/remove/{id}", methods={"GET"})
      */
-    public function delete(Projeto $projeto){
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($projeto);
-        $em->flush();
+    public function delete(Projeto $projeto, EntityManagerInterface $entityManager){
+        $entityManager->remove($projeto);
+        $entityManager->flush();
 
         return $this->redirect("/projeto/lista");
     }
