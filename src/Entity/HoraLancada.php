@@ -36,20 +36,13 @@ class HoraLancada
      */
     private $projeto;
 
+    //----------Get---------
     /**
      * @return mixed
      */
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
     /**
@@ -61,27 +54,11 @@ class HoraLancada
     }
 
     /**
-     * @param mixed $descricao
-     */
-    public function setDescricao($descricao)
-    {
-        $this->descricao = $descricao;
-    }
-
-    /**
      * @return mixed
      */
     public function getQuantidade()
     {
         return $this->quantidade;
-    }
-
-    /**
-     * @param mixed $quantidade
-     */
-    public function setQuantidade($quantidade)
-    {
-        $this->quantidade = $quantidade;
     }
 
     /**
@@ -93,19 +70,43 @@ class HoraLancada
     }
 
     /**
-     * @param mixed $funcionario
-     */
-    public function setFuncionario($funcionario)
-    {
-        $this->funcionario = $funcionario;
-    }
-
-    /**
      * @return mixed
      */
     public function getProjeto()
     {
         return $this->projeto;
+    }
+    //----------Set---------
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @param mixed $descricao
+     */
+    public function setDescricao($descricao)
+    {
+        $this->descricao = $descricao;
+    }
+
+    /**
+     * @param mixed $quantidade
+     */
+    public function setQuantidade($quantidade)
+    {
+        $this->quantidade = $quantidade;
+    }
+
+    /**
+     * @param mixed $funcionario
+     */
+    public function setFuncionario($funcionario)
+    {
+        $this->funcionario = $funcionario;
     }
 
     /**

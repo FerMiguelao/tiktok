@@ -39,21 +39,18 @@ class Projeto
         $this->horasLancadas = new ArrayCollection();
     }
 
+    public function __toString()
+    {
+        return $this->getNome();
+    }
 
+    //----------Get---------
     /**
      * @return mixed
      */
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
     /**
@@ -65,39 +62,11 @@ class Projeto
     }
 
     /**
-     * @param mixed $nome
-     */
-    public function setNome($nome)
-    {
-        $this->nome = $nome;
-    }
-
-    /**
      * @return mixed
      */
     public function getFuncionarios()
     {
         return $this->funcionarios;
-    }
-
-    /**
-     * @param mixed $funcionarios
-     */
-    public function setFuncionarios($funcionarios)
-    {
-        $this->funcionarios = $funcionarios;
-    }
-
-    public function addFuncionario(Funcionario $funcionario)
-    {
-        $funcionario->setProjeto($this);
-        $this->funcionarios->add($funcionario);
-    }
-
-    public function removeFuncionario(Funcionario $funcionario)
-    {
-        $funcionario->setProjeto(null);
-        $this->funcionarios->remove($funcionario);
     }
 
     /**
@@ -117,6 +86,30 @@ class Projeto
 
         return $horas;
     }
+    //--------Set-------
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @param mixed $nome
+     */
+    public function setNome($nome)
+    {
+        $this->nome = $nome;
+    }
+
+    /**
+     * @param mixed $funcionarios
+     */
+    public function setFuncionarios($funcionarios)
+    {
+        $this->funcionarios = $funcionarios;
+    }
 
     /**
      * @param mixed $horasLancadas
@@ -124,6 +117,19 @@ class Projeto
     public function setHorasLancadas($horasLancadas)
     {
         $this->horasLancadas = $horasLancadas;
+    }
+
+    //------------Add & Remove----------
+    public function addFuncionario(Funcionario $funcionario)
+    {
+        $funcionario->setProjeto($this);
+        $this->funcionarios->add($funcionario);
+    }
+
+    public function removeFuncionario(Funcionario $funcionario)
+    {
+        $funcionario->setProjeto(null);
+        $this->funcionarios->remove($funcionario);
     }
 
     public function addHorasLancada(HoraLancada $hora)
@@ -136,8 +142,5 @@ class Projeto
         $this->horasLancadas->remove($hora);
     }
 
-    public function __toString()
-    {
-        return $this->getNome();
-    }
+
 }

@@ -3,51 +3,39 @@ namespace App\Controller;
 
 use App\Entity\Funcionario;
 use App\Entity\Projeto;
+use App\Form\ProjetoType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProjetoController extends AbstractController{
     /**
-     * @Route("/projeto/mostra",methods="GET")
+     * @Route("/projeto/mostra/{id}",methods={"GET"})
      */
-    public function mostraAction(){
-        return $this->render('Projeto/mostra.html.twig',["projeto" => new Projeto()]);
+    public function mostraaction(Projeto $projeto){
+        return $this->render('Projeto/mostra.html.twig',["projeto" => $projeto]);
     }
 
     /**
-     * @Route("/projeto/novo",methods="GET")
+     * @Route("/projeto/novo", methods={"GET", "POST"})
      */
-    public function formulario(){
-        $form = $this->createFormBuilder(new Projeto())
-            ->add('nome')
-            ->setAction('/projeto/novo')
-            ->getForm();
-
-        return $this->render("Projeto/novo.html.twig",["form" => $form->createView()]);
-    }
-
-    /**
-     * @Route("/projeto/novo",methods="POST")
-     */
-    public function cria(Request $request){
+    public function formulario(Request $request){
         $projeto = new Projeto();
-
-        $form = $this->createFormBuilder($projeto)
-            ->add('nome')
-            ->getForm();
-
+        $form = $this->createForm(ProjetoType::class, $projeto);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($projeto);
-        $em->flush();
+        if($form->isSubmitted() && $form->isValid()){
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($projeto);
+            $em->flush();
 
-        return $this->redirect("/projeto/lista");
+            return $this->redirect("/projeto/lista/");
+        }
+        return $this->renderForm('Projeto/novo.html.twig',["projeto" => $projeto,"form" => $form]);
     }
 
     /**
-     * @Route("/projeto/lista",methods="GET")
+     * @Route("/projeto/lista",methods={"GET"})
      */
     public function lista(){
         $repository = $this->getDoctrine()->getManager()->getRepository(Projeto::class);
@@ -56,50 +44,22 @@ class ProjetoController extends AbstractController{
     }
 
     /**
-     * @Route("/projeto/edita/{id}",methods="GET")
-     */
-    public function mostra(Projeto $projeto){
-        $form = $this->createFormBuilder($projeto)
-            ->add('nome')
-            ->add('funcionarios')
-            ->setAction("/projeto/edita/".$projeto->getId())
-            ->getForm();
-
-        return $this->render('Projeto/edita.html.twig',["projeto" => $projeto,"form" => $form->createView()]);
-    }
-
-    /**
-     * @Route("/projeto/edita/{id}",methods="POST")
+     * @Route("/projeto/edita/{id}",methods={"GET", "POST"})
      */
     public function edita(Projeto $projeto, Request $request){
-        $form = $this->createFormBuilder($projeto)
-            ->add('nome')
-            ->add('funcionarios')
-            ->getForm();
-
+        $form = $this->createForm(ProjetoType::class, $projeto);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
-            $projeto = $form->getData();
-
+        if($form->isSubmitted() && $form->isValid()){
             $em = $this->getDoctrine()->getManager();
-
-            foreach($projeto->getFuncionarios() as $funcionario){
-                $funcionario->setProjeto($projeto);
-                $em->merge($funcionario);
-            }
-
-            $em->merge($projeto);
+            $em->persist($projeto);
             $em->flush();
-
-            return $this->redirect("/projeto/edita/".$projeto->getId());
         }
-
-        return $this->render('Projeto/edita.html.twig',["projeto" => $projeto]);
+        return $this->renderForm('Projeto/edita.html.twig',["projeto" => $projeto,"form" => $form]);
     }
 
     /**
-     * @Route("/projeto/remove/{id}",methods="GET")
+     * @Route("/projeto/remove/{id}", methods={"GET"})
      */
     public function delete(Projeto $projeto){
         $em = $this->getDoctrine()->getManager();

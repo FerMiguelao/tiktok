@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  */
 class Funcionario{
+
+    //-----Atributos, Construtor e Método String-----
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -39,8 +41,11 @@ class Funcionario{
      */
     private $horasLancadas;
 
-    public function __toString()
-    {
+    public function __construct(){
+        $this->setDataDeEntrada(new \DateTime());
+    }
+
+    public function __toString(){
         return $this->getNome();
     }
     //-----------Get--------------
@@ -108,6 +113,14 @@ class Funcionario{
     }
 
     //----------------Set-------------------
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id): void
+    {
+        $this->id = $id;
+    }
 
     /**
      * @param mixed $nome

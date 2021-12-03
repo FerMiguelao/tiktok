@@ -3,57 +3,40 @@ namespace App\Controller;
 
 use App\Entity\Funcionario;
 use App\Entity\HoraLancada;
+use App\Form\FuncionarioType;
+use App\Form\HoraLancadaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class HoraLancadaController extends AbstractController{
     /**
-     * @Route("/projeto/mostra",methods="GET")
+     * @Route("/horaLancada/mostra/{id}", methods={"GET"})
      */
-    public function mostraAction(){
-        return $this->render('Projeto/mostra.html.twig',["horaLancada" => new HoraLancada()]);
+    public function mostraaction(HoraLancada $horaLancada){
+        return $this->render('HoraLancada/mostra.html.twig',["horaLancada" => $horaLancada]);
     }
 
     /**
-     * @Route("/horaLancada/novo",methods="GET")
+     * @Route("/horaLancada/novo", methods={"GET", "POST"})
      */
-    public function formulario(){
-        $form = $this->createFormBuilder(new HoraLancada())
-            ->add('descricao')
-            ->add('quantidade')
-            ->add('funcionario')
-            ->add('projeto')
-            ->setAction('/horaLancada/novo')
-            ->getForm();
-
-        return $this->render("HoraLancada/novo.html.twig",["form" => $form->createView()]);
-    }
-
-    /**
-     * @Route("/horaLancada/novo",methods="POST")
-     */
-    public function cria(Request $request){
-        $projeto = new HoraLancada();
-
-        $form = $this->createFormBuilder($projeto)
-            ->add('descricao')
-            ->add('quantidade')
-            ->add('funcionario')
-            ->add('projeto')
-            ->getForm();
-
+    public function formulario(Request $request){
+        $horaLancada = new HoraLancada();
+        $form = $this->createForm(HoraLancadaType::class, $horaLancada);
         $form->handleRequest($request);
 
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($projeto);
-        $em->flush();
+        if($form->isSubmitted() && $form->isValid()){
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($horaLancada);
+            $em->flush();
 
-        return $this->redirect("/horaLancada/lista");
+            return $this->redirect("/horaLancada/lista/");
+        }
+        return $this->renderForm('HoraLancada/novo.html.twig',["horaLancada" => $horaLancada,"form" => $form]);
     }
 
     /**
-     * @Route("/horaLancada/lista",methods="GET")
+     * @Route("/horaLancada/lista", methods={"GET"})
      */
     public function lista(){
         $repository = $this->getDoctrine()->getManager()->getRepository(HoraLancada::class);
@@ -62,50 +45,23 @@ class HoraLancadaController extends AbstractController{
     }
 
     /**
-     * @Route("/horaLancada/edita/{id}",methods="GET")
+     * @Route("horaLancada/edita/{id}",methods={"GET", "POST"})
      */
-    public function mostra(HoraLancada $horaLancada){
-        $form = $this->createFormBuilder($horaLancada)
-            ->add('descricao')
-            ->add('quantidade')
-            ->add('funcionario')
-            ->add('projeto')
-            ->setAction("/horaLancada/edita/".$horaLancada->getId())
-            ->setMethod("POST")
-            ->getForm();
-
-        return $this->render('HoraLancada/edita.html.twig',["horaLancada" => $horaLancada,"form" => $form->createView()]);
-    }
-
-    /**
-     * @Route("/horaLancada/edita/{id}",methods="POST")
-     */
-    public function edita(HoraLancada $horaLancada, Request $request){
-        $form = $this->createFormBuilder($horaLancada)
-            ->add('descricao')
-            ->add('quantidade')
-            ->add('funcionario')
-            ->add('projeto')
-            ->getForm();
-
+    public function edita(HoraLancada $horaLancada,Request $request){
+        $form = $this->createForm(HoraLancadaType::class, $horaLancada);
         $form->handleRequest($request);
 
-        if($form->isValid()){
-            $horaLancada = $form->getData();
-
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-
-            $em->merge($horaLancada);
+            $em->persist($horaLancada);
             $em->flush();
-
-            return $this->redirect("/horaLancada/edita/".$horaLancada->getId());
         }
 
-        return $this->render('HoraLancada/edita.html.twig',["horaLancada" => $horaLancada]);
+        return $this->renderForm('HoraLancada/edita.html.twig', ['horaLancada' => $horaLancada, 'form' => $form]);
     }
 
     /**
-     * @Route("/horaLancada/remove/{id}",methods="GET")
+     * @Route("/horaLancada/remove/{id}", methods={"GET"})
      */
     public function delete(HoraLancada $projeto){
         $em = $this->getDoctrine()->getManager();
